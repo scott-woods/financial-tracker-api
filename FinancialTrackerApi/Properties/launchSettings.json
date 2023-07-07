@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "FinancialTrackerAPI": {
+    "FinancialTrackerApi": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
