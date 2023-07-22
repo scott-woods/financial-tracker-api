@@ -3,6 +3,7 @@ using FinancialTrackerApi.Context;
 using FinancialTrackerApi.Models.DTOs;
 using FinancialTrackerApi.Services;
 using FinancialTrackerApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,8 +11,8 @@ namespace FinancialTrackerApi.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]/{userId}")]
-    public class DebtsController : ControllerBase
+    [Route("api/v{version:apiVersion}/[controller]")]
+    public class DebtsController : BaseApiController
     {
         private readonly ILogger<DebtsController> _log;
         private readonly AppDbContext _dbContext;
@@ -25,7 +26,7 @@ namespace FinancialTrackerApi.Controllers
         /// <param name="log"></param>
         /// <param name="dbContext"></param>
         public DebtsController(ILogger<DebtsController> log, AppDbContext dbContext, IMapper mapper, IDebtService debtService,
-            IUserService userService)
+            IUserService userService) : base(log, userService)
         {
             _log = log;
             _dbContext = dbContext;
@@ -41,13 +42,14 @@ namespace FinancialTrackerApi.Controllers
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ApiVersion("1.0")]
+        [Authorize]
         [HttpGet]
-        public IActionResult GetDebts([FromRoute] int userId)
+        public IActionResult GetDebts()
         {
             try
             {
                 //validate userId
-                if (userId <= 0)
+                if (!userId.HasValue)
                 {
                     var errorMessage = "Exception occurred while getting Debts - Invalid User Id";
                     var e = new Exception(errorMessage);
@@ -55,19 +57,10 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                //get user, throws key not found exception if user isn't found
-                var userDto = _userService.GetUser(userId);
-
                 //Get debts
-                var debts = _debtService.GetDebts(userId);
+                var debts = _debtService.GetDebts(userId.Value);
 
                 return Ok(debts);
-            }
-            catch (KeyNotFoundException e)
-            {
-                var message = "Exception occurred while getting Debts";
-                _log.LogError(e, message);
-                return NotFound(e);
             }
             catch (Exception e)
             {
@@ -86,13 +79,14 @@ namespace FinancialTrackerApi.Controllers
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ApiVersion("1.0")]
+        [Authorize]
         [HttpPost]
-        public IActionResult AddDebts([FromRoute] int userId, List<DebtDTO> debtDtos)
+        public IActionResult AddDebts(List<DebtDTO> debtDtos)
         {
             try
             {
                 //validate userId
-                if (userId <= 0)
+                if (!userId.HasValue)
                 {
                     var errorMessage = "Exception occurred while getting Debts - Invalid User Id";
                     var e = new Exception(errorMessage);
@@ -100,10 +94,7 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                //get user, throws key not found exception if user isn't found
-                var userDto = _userService.GetUser(userId);
-
-                var success = _debtService.UpdateDebtList(userId, debtDtos);
+                var success = _debtService.UpdateDebtList(userId.Value, debtDtos);
 
                 if (!success)
                 {
@@ -116,12 +107,6 @@ namespace FinancialTrackerApi.Controllers
                 {
                     return Ok(success);
                 }
-            }
-            catch (KeyNotFoundException e)
-            {
-                var message = "Exception occurred while adding Debts";
-                _log.LogError(e, message);
-                return NotFound(e);
             }
             catch (Exception e)
             {

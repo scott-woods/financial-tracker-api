@@ -12,7 +12,8 @@ namespace FinancialTrackerApi.Mapping
         public MappingProfile()
         {
             CreateMap<User, UserDTO>();
-            CreateMap<UserDTO, User>();
+            CreateMap<UserDTO, User>()
+                .ForMember(u => u.Auth0UserId, opt => opt.Ignore());
 
             CreateMap<Asset, AssetDTO>();
             CreateMap<AssetDTO, Asset>()

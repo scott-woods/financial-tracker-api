@@ -3,6 +3,7 @@ using FinancialTrackerApi.Context;
 using FinancialTrackerApi.Models.DatabaseModels;
 using FinancialTrackerApi.Models.DTOs;
 using FinancialTrackerApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +11,7 @@ namespace FinancialTrackerApi.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]/{userId}")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class AssetsController : BaseApiController
     {
         private readonly ILogger<AssetsController> _log;
@@ -25,7 +26,7 @@ namespace FinancialTrackerApi.Controllers
         /// <param name="log"></param>
         /// <param name="dbContext"></param>
         public AssetsController(ILogger<AssetsController> log, AppDbContext dbContext, IMapper mapper,
-            IAssetService assetService, IUserService userService)
+            IAssetService assetService, IUserService userService) : base(log, userService)
         {
             _log = log;
             _dbContext = dbContext;
@@ -37,22 +38,22 @@ namespace FinancialTrackerApi.Controllers
         #region GET
 
         /// <summary>
-        /// Get all assets by user id
+        /// Get all assets
         /// </summary>
-        /// <param name="userId"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<AssetDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ApiVersion("1.0")]
+        [Authorize]
         [HttpGet]
-        public IActionResult GetAssets([FromRoute] int userId) 
+        public IActionResult GetAssets() 
         {
             try
             {
                 //validate userId
-                if (userId <= 0)
+                if (!userId.HasValue)
                 {
                     var errorMessage = "Exception occurred while getting Assets - Invalid User Id";
                     var e = new Exception(errorMessage);
@@ -60,19 +61,10 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                //get user, throws key not found exception if user isn't found
-                var userDto = _userService.GetUser(userId);
-
                 //get assets
-                var assetDtos = _assetService.GetAllAssets(userId);
+                var assetDtos = _assetService.GetAllAssets(userId.Value);
 
                 return Ok(assetDtos);
-            }
-            catch (KeyNotFoundException e)
-            {
-                var message = "Exception occurred while getting Assets";
-                _log.LogError(e, message);
-                return NotFound(e);
             }
             catch (Exception e)
             {
@@ -87,13 +79,14 @@ namespace FinancialTrackerApi.Controllers
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ApiVersion("1.0")]
+        [Authorize]
         [HttpGet("liquidAssets")]
-        public IActionResult GetLiquidAssets([FromRoute] int userId)
+        public IActionResult GetLiquidAssets()
         {
             try
             {
                 //validate userId
-                if (userId <= 0)
+                if (!userId.HasValue)
                 {
                     var errorMessage = "Exception occurred while getting Liquid Assets - Invalid User Id";
                     var e = new Exception(errorMessage);
@@ -101,18 +94,9 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                //get user, throws key not found exception if user isn't found
-                var userDto = _userService.GetUser(userId);
-
-                var assetDtos = _assetService.GetLiquidAssets(userId);
+                var assetDtos = _assetService.GetLiquidAssets(userId.Value);
 
                 return Ok(assetDtos);
-            }
-            catch (KeyNotFoundException e)
-            {
-                var message = "Exception occurred while getting Liquid Assets";
-                _log.LogError(e, message);
-                return NotFound(e);
             }
             catch (Exception e)
             {
@@ -127,13 +111,14 @@ namespace FinancialTrackerApi.Controllers
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ApiVersion("1.0")]
+        [Authorize]
         [HttpGet("nonLiquidAssets")]
-        public IActionResult GetNonLiquidAssets([FromRoute] int userId)
+        public IActionResult GetNonLiquidAssets()
         {
             try
             {
                 //validate userId
-                if (userId <= 0)
+                if (!userId.HasValue)
                 {
                     var errorMessage = "Exception occurred while getting Non Liquid Assets - Invalid User Id";
                     var e = new Exception(errorMessage);
@@ -141,18 +126,9 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                //get user, throws key not found exception if user isn't found
-                var userDto = _userService.GetUser(userId);
-
-                var assetDtos = _assetService.GetNonLiquidAssets(userId);
+                var assetDtos = _assetService.GetNonLiquidAssets(userId.Value);
 
                 return Ok(assetDtos);
-            }
-            catch (KeyNotFoundException e)
-            {
-                var message = "Exception occurred while getting Non Liquid Assets";
-                _log.LogError(e, message);
-                return NotFound(e);
             }
             catch (Exception e)
             {
@@ -170,13 +146,14 @@ namespace FinancialTrackerApi.Controllers
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest | StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [Authorize]
         [HttpPost]
-        public IActionResult AddAssets([FromRoute] int userId, List<AssetDTO> assetDtos)
+        public IActionResult AddAssets(List<AssetDTO> assetDtos)
         {
             try
             {
                 //validate userId
-                if (userId <= 0)
+                if (!userId.HasValue)
                 {
                     var errorMessage = "Exception occurred while adding Assets - Invalid User Id";
                     var e = new Exception(errorMessage);
@@ -184,10 +161,7 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                //get user, throws key not found exception if user isn't found
-                var userDto = _userService.GetUser(userId);
-
-                var success = _assetService.UpdateAssetList(userId, assetDtos);
+                var success = _assetService.UpdateAssetList(userId.Value, assetDtos);
 
                 if (!success)
                 {
@@ -200,12 +174,6 @@ namespace FinancialTrackerApi.Controllers
                 {
                     return Ok(success);
                 }
-            }
-            catch (KeyNotFoundException e)
-            {
-                var message = "Exception occurred while adding Assets";
-                _log.LogError(e, message);
-                return NotFound(e);
             }
             catch(Exception e)
             {

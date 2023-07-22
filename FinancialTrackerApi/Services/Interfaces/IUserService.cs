@@ -14,5 +14,12 @@ namespace FinancialTrackerApi.Services.Interfaces
         /// <param name="userId"></param>
         /// <returns></returns>
         public UserDTO? GetUser(int userId);
+
+        /// <summary>
+        /// Get user ef object by auth0 id
+        /// </summary>
+        /// <param name="auth0UserId"></param>
+        /// <returns></returns>
+        public User GetUserByAuth0Id(string auth0UserId);
     }
 }
