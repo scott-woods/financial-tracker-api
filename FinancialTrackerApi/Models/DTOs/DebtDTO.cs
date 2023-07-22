@@ -1,18 +1,16 @@
-﻿namespace FinancialTrackerApi.Models.DatabaseModels
+﻿using FinancialTrackerApi.Models.DatabaseModels;
+
+namespace FinancialTrackerApi.Models.DTOs
 {
     /// <summary>
-    /// Recurring income
+    /// Debt DTO
     /// </summary>
-    public class RecurringIncome
+    public class DebtDTO
     {
         /// <summary>
-        /// recurring income id
+        /// Id
         /// </summary>
         public int Id { get; set; }
-        /// <summary>
-        /// User id fk
-        /// </summary>
-        public virtual User User { get; set; }
         /// <summary>
         /// name
         /// </summary>
@@ -22,8 +20,12 @@
         /// </summary>
         public float Amount { get; set; }
         /// <summary>
-        /// Timeframe
+        /// date created
         /// </summary>
-        public Timeframe Timeframe { get; set; }
+        public DateTime DateCreated { get; set; }
+        /// <summary>
+        /// date last updated
+        /// </summary>
+        public DateTime DateLastUpdated { get; set; }
     }
 }

@@ -1,29 +1,29 @@
-﻿namespace FinancialTrackerApi.Models.DatabaseModels
+﻿namespace FinancialTrackerApi.Models.DTOs
 {
     /// <summary>
-    /// Recurring income
+    /// Recurring Expense DTO
     /// </summary>
-    public class RecurringIncome
+    public class RecurringExpenseDTO
     {
         /// <summary>
-        /// recurring income id
+        /// Id
         /// </summary>
         public int Id { get; set; }
         /// <summary>
-        /// User id fk
-        /// </summary>
-        public virtual User User { get; set; }
-        /// <summary>
-        /// name
+        /// Expense name
         /// </summary>
         public string Name { get; set; }
         /// <summary>
-        /// amount
+        /// Amount
         /// </summary>
         public float Amount { get; set; }
         /// <summary>
-        /// Timeframe
+        /// Timeframe (monthly, yearly)
         /// </summary>
         public Timeframe Timeframe { get; set; }
+        /// <summary>
+        /// Date expense stops
+        /// </summary>
+        public DateTime EndDate { get; set; }
     }
 }

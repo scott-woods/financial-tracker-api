@@ -1,18 +1,14 @@
-﻿namespace FinancialTrackerApi.Models.DatabaseModels
+﻿namespace FinancialTrackerApi.Models.DTOs
 {
     /// <summary>
-    /// savings goal
+    /// Savings Goal DTO
     /// </summary>
-    public class SavingsGoal
+    public class SavingsGoalDTO
     {
         /// <summary>
-        /// id
+        /// Id
         /// </summary>
         public int Id { get; set; }
-        /// <summary>
-        /// user id fk
-        /// </summary>
-        public virtual User User { get; set; }
         /// <summary>
         /// goal amount
         /// </summary>

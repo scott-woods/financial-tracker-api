@@ -1,18 +1,14 @@
-﻿namespace FinancialTrackerApi.Models.DatabaseModels
+﻿namespace FinancialTrackerApi.Models.DTOs
 {
     /// <summary>
-    /// Recurring income
+    /// Recurring Investment DTO
     /// </summary>
-    public class RecurringIncome
+    public class RecurringInvestmentDTO
     {
         /// <summary>
-        /// recurring income id
+        /// Id
         /// </summary>
         public int Id { get; set; }
-        /// <summary>
-        /// User id fk
-        /// </summary>
-        public virtual User User { get; set; }
         /// <summary>
         /// name
         /// </summary>
@@ -22,8 +18,12 @@
         /// </summary>
         public float Amount { get; set; }
         /// <summary>
-        /// Timeframe
+        /// timeframe (monthly, yearly)
         /// </summary>
         public Timeframe Timeframe { get; set; }
+        /// <summary>
+        /// true if this should be subtracted from income
+        /// </summary>
+        public bool IsFromLiquid { get; set; }
     }
 }

@@ -1,18 +1,16 @@
-﻿namespace FinancialTrackerApi.Models.DatabaseModels
+﻿using FinancialTrackerApi.Models.DatabaseModels;
+
+namespace FinancialTrackerApi.Models.DTOs
 {
     /// <summary>
-    /// keeps track of net worth when updating assets and debts
+    /// Net Worth Report DTO
     /// </summary>
-    public class NetWorthReport
+    public class NetWorthReportDTO
     {
         /// <summary>
-        /// id
+        /// Id
         /// </summary>
         public int Id { get; set; }
-        /// <summary>
-        /// user id fk
-        /// </summary>
-        public virtual User User { get; set; }
         /// <summary>
         /// date report was generated
         /// </summary>

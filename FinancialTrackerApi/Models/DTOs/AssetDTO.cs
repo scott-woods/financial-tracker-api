@@ -1,18 +1,16 @@
-﻿namespace FinancialTrackerApi.Models.DatabaseModels
+﻿using FinancialTrackerApi.Models.DatabaseModels;
+
+namespace FinancialTrackerApi.Models.DTOs
 {
     /// <summary>
-    /// Asset
+    /// Asset DTO
     /// </summary>
-    public class Asset
+    public class AssetDTO
     {
         /// <summary>
-        /// id
+        /// Id
         /// </summary>
         public int Id { get; set; }
-        /// <summary>
-        /// user id fk
-        /// </summary>
-        public virtual User User { get; set; }
         /// <summary>
         /// name
         /// </summary>

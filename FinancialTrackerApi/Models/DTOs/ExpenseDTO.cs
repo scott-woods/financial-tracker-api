@@ -1,25 +1,25 @@
-﻿namespace FinancialTrackerApi.Models.DatabaseModels
+﻿namespace FinancialTrackerApi.Models.DTOs
 {
     /// <summary>
-    /// savings goal
+    /// Expense DTO
     /// </summary>
-    public class SavingsGoal
+    public class ExpenseDTO
     {
         /// <summary>
-        /// id
+        /// Id
         /// </summary>
         public int Id { get; set; }
         /// <summary>
-        /// user id fk
+        /// name (optional)
         /// </summary>
-        public virtual User User { get; set; }
+        public string Name { get; set; }
         /// <summary>
-        /// goal amount
+        /// Amount
         /// </summary>
         public float Amount { get; set; }
         /// <summary>
-        /// date goal was created
+        /// date added
         /// </summary>
-        public DateTime DateCreated { get; set; }
+        public DateTime Date { get; set; }
     }
 }

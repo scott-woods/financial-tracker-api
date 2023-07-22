@@ -12,7 +12,7 @@
         /// <summary>
         /// Foreign key to user
         /// </summary>
-        public User User { get; set; }
+        public virtual User User { get; set; }
         /// <summary>
         /// Expense name
         /// </summary>

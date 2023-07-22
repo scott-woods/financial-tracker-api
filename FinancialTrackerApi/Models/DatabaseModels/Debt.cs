@@ -12,7 +12,7 @@
         /// <summary>
         /// user id fk
         /// </summary>
-        public User User { get; set; }
+        public virtual User User { get; set; }
         /// <summary>
         /// name
         /// </summary>

@@ -15,6 +15,7 @@ var config = new ConfigurationBuilder()
 var connectionString = config.GetConnectionString("MyDbContext");
 
 // Add services to the container.
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -29,12 +30,12 @@ builder.Services.AddApiVersioning(options =>
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.DefaultApiVersion = Microsoft.AspNetCore.Mvc.ApiVersion.Default;
 });
-
 builder.Services.AddVersionedApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
 });
+builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 //Add db context
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -44,6 +45,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 //Add scoped services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAssetService, AssetService>();
+
+//Add auto mapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
@@ -54,6 +59,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint($"/swagger/v1/swagger.json", "V1.0");
+        //options.ConfigObject.AdditionalItems.Add("syntaxHighlight", false);
+        //options.ConfigObject.AdditionalItems.Add("theme", "agate");
     });
 }
 
