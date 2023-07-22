@@ -13,7 +13,7 @@ namespace FinancialTrackerApi.Controllers
         private readonly ILogger<UsersController> _log;
         private readonly IUserService _userService;
 
-        public UsersController(IUserService userService, ILogger<UsersController> log)
+        public UsersController(IUserService userService, ILogger<UsersController> log) : base(log, userService)
         {
             _userService = userService;
             _log = log;

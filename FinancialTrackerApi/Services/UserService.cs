@@ -48,5 +48,24 @@ namespace FinancialTrackerApi.Services
                 throw;
             }
         }
+
+        /// <summary>
+        /// Get user by auth 0 id
+        /// </summary>
+        /// <param name="auth0UserId"></param>
+        /// <returns></returns>
+        public User? GetUserByAuth0Id(string auth0UserId)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Auth0UserId == auth0UserId);
+                return user;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, $"Exception occurred while getting User with Auth0 id {auth0UserId}");
+                throw;
+            }
+        }
     }
 }
