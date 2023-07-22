@@ -1,4 +1,5 @@
 ﻿using FinancialTrackerApi.Models.DatabaseModels;
+using FinancialTrackerApi.Models.DTOs;
 
 namespace FinancialTrackerApi.Services.Interfaces
 {
@@ -8,9 +9,10 @@ namespace FinancialTrackerApi.Services.Interfaces
     public interface IUserService
     {
         /// <summary>
-        /// Get all users
+        /// Get user by id
         /// </summary>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        public List<User> GetUsers();
+        public UserDTO? GetUser(int userId);
     }
 }

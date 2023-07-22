@@ -11,24 +11,27 @@ namespace FinancialTrackerApi.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]/{userId}")]
-    public class AssetsController : ControllerBase
+    public class AssetsController : BaseApiController
     {
         private readonly ILogger<AssetsController> _log;
         private readonly AppDbContext _dbContext;
         private IMapper _mapper;
         private IAssetService _assetService;
+        private IUserService _userService;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="log"></param>
         /// <param name="dbContext"></param>
-        public AssetsController(ILogger<AssetsController> log, AppDbContext dbContext, IMapper mapper, IAssetService assetService)
+        public AssetsController(ILogger<AssetsController> log, AppDbContext dbContext, IMapper mapper,
+            IAssetService assetService, IUserService userService)
         {
             _log = log;
             _dbContext = dbContext;
             _mapper = mapper;
             _assetService = assetService;
+            _userService = userService;
         }
 
         #region GET
@@ -40,6 +43,7 @@ namespace FinancialTrackerApi.Controllers
         /// <returns></returns>
         [ProducesResponseType(typeof(List<AssetDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ApiVersion("1.0")]
         [HttpGet]
@@ -56,10 +60,19 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
+                //get user, throws key not found exception if user isn't found
+                var userDto = _userService.GetUser(userId);
+
                 //get assets
                 var assetDtos = _assetService.GetAllAssets(userId);
 
                 return Ok(assetDtos);
+            }
+            catch (KeyNotFoundException e)
+            {
+                var message = "Exception occurred while getting Assets";
+                _log.LogError(e, message);
+                return NotFound(e);
             }
             catch (Exception e)
             {
@@ -71,6 +84,7 @@ namespace FinancialTrackerApi.Controllers
 
         [ProducesResponseType(typeof(List<AssetDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ApiVersion("1.0")]
         [HttpGet("liquidAssets")]
@@ -87,9 +101,18 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
+                //get user, throws key not found exception if user isn't found
+                var userDto = _userService.GetUser(userId);
+
                 var assetDtos = _assetService.GetLiquidAssets(userId);
 
                 return Ok(assetDtos);
+            }
+            catch (KeyNotFoundException e)
+            {
+                var message = "Exception occurred while getting Liquid Assets";
+                _log.LogError(e, message);
+                return NotFound(e);
             }
             catch (Exception e)
             {
@@ -101,6 +124,7 @@ namespace FinancialTrackerApi.Controllers
 
         [ProducesResponseType(typeof(List<AssetDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ApiVersion("1.0")]
         [HttpGet("nonLiquidAssets")]
@@ -117,9 +141,18 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
+                //get user, throws key not found exception if user isn't found
+                var userDto = _userService.GetUser(userId);
+
                 var assetDtos = _assetService.GetNonLiquidAssets(userId);
 
                 return Ok(assetDtos);
+            }
+            catch (KeyNotFoundException e)
+            {
+                var message = "Exception occurred while getting Non Liquid Assets";
+                _log.LogError(e, message);
+                return NotFound(e);
             }
             catch (Exception e)
             {
@@ -135,6 +168,7 @@ namespace FinancialTrackerApi.Controllers
 
         [ApiVersion("1.0")]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest | StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [HttpPost]
         public IActionResult AddAssets([FromRoute] int userId, List<AssetDTO> assetDtos)
@@ -150,6 +184,9 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
+                //get user, throws key not found exception if user isn't found
+                var userDto = _userService.GetUser(userId);
+
                 var success = _assetService.UpdateAssetList(userId, assetDtos);
 
                 if (!success)
@@ -163,6 +200,12 @@ namespace FinancialTrackerApi.Controllers
                 {
                     return Ok(success);
                 }
+            }
+            catch (KeyNotFoundException e)
+            {
+                var message = "Exception occurred while adding Assets";
+                _log.LogError(e, message);
+                return NotFound(e);
             }
             catch(Exception e)
             {

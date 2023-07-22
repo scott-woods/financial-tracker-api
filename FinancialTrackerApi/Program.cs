@@ -46,6 +46,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //Add scoped services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
+builder.Services.AddScoped<IDebtService, DebtService>();
 
 //Add auto mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
