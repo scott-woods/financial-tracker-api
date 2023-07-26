@@ -18,6 +18,9 @@ var config = new ConfigurationBuilder()
 //Get connection string from appsettings
 var connectionString = config.GetConnectionString("MyDbContext");
 
+//Get db provider
+var dbProvider = config.GetValue<string>("DbProvider");
+
 //Add authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -75,10 +78,26 @@ builder.Services.AddVersionedApiExplorer(options =>
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 //Add db context
-builder.Services.AddDbContext<AppDbContext>(options =>
+if (dbProvider == "Postgres")
 {
-    options.UseSqlServer(connectionString);
-});
+    builder.Services.AddDbContext<AppDbContext>(options =>
+    {
+        options.UseNpgsql(connectionString, opt =>
+        {
+            opt.MigrationsAssembly("FinancialTrackerApi.Postgres");
+        });
+    });
+}
+else if (dbProvider == "Mssql")
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+    {
+        options.UseSqlServer(connectionString, opt =>
+        {
+            opt.MigrationsAssembly("FinancialTrackerApi.Mssql");
+        });
+    });
+}
 
 //Add scoped services
 builder.Services.AddScoped<IUserService, UserService>();
