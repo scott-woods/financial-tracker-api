@@ -112,6 +112,7 @@ builder.Services.AddScoped<IExpenseService,  ExpenseService>();
 builder.Services.AddScoped<IRecurringExpensesService, RecurringExpensesService>();
 builder.Services.AddScoped<IRecurringIncomeService, RecurringIncomeService>();
 builder.Services.AddScoped<INetWorthReportService, NetWorthReportService>();
+builder.Services.AddScoped<IRecurringInvestmentService, RecurringInvestmentService>();
 
 //Add auto mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
