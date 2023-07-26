@@ -24,8 +24,8 @@ namespace FinancialTrackerApi.Controllers
         [HttpPost]
         public IActionResult Authenticate(AuthenticateRequest authRequest)
         {
-            var domain = _config.GetValue<string>("Auth0:Domain");
-            var audience = _config.GetValue<string>("Auth0:Audience");
+            var domain = _config["Auth0:Domain"];
+            var audience = _config["Auth0:Audience"];
 
             var client = new RestClient($"https://{domain}/oauth/token");
             var request = new RestRequest("", Method.Post);

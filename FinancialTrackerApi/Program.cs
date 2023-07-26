@@ -4,6 +4,7 @@ using FinancialTrackerApi.Services;
 using FinancialTrackerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
@@ -16,10 +17,13 @@ var config = new ConfigurationBuilder()
     .Build();
 
 //Get connection string from appsettings
-var connectionString = config.GetConnectionString("MyDbContext");
+var connectionStringBuilder = new SqlConnectionStringBuilder(
+        builder.Configuration.GetConnectionString("MyDbContext"));
+connectionStringBuilder.Password = builder.Configuration["DbPassword"];
+var connectionString = connectionStringBuilder.ConnectionString;
 
 //Get db provider
-var dbProvider = config.GetValue<string>("DbProvider");
+var dbProvider = builder.Configuration.GetValue<string>("DbProvider");
 
 //Add authentication
 builder.Services.AddAuthentication(options =>
