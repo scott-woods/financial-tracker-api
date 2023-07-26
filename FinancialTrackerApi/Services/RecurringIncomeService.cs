@@ -2,47 +2,48 @@
 using FinancialTrackerApi.Context;
 using FinancialTrackerApi.Models.DatabaseModels;
 using FinancialTrackerApi.Models.DTOs;
+using FinancialTrackerApi.Services.Interfaces;
 
-namespace FinancialTrackerApi.Services.Interfaces
+namespace FinancialTrackerApi.Services
 {
-    public class RecurringExpensesService : IRecurringExpensesService
+    public class RecurringIncomeService : IRecurringIncomeService
     {
-        private readonly ILogger<RecurringExpensesService> _log;
+        private readonly ILogger<RecurringIncomeService> _log;
         private readonly AppDbContext _context;
         private IMapper _mapper;
 
-        public RecurringExpensesService(ILogger<RecurringExpensesService> log, AppDbContext context, IMapper mapper)
+        public RecurringIncomeService(ILogger<RecurringIncomeService> log, AppDbContext context, IMapper mapper)
         {
             _log = log;
             _context = context;
             _mapper = mapper;
         }
 
-        public List<RecurringExpenseDTO> GetRecurringExpenses(int userId)
+        public List<RecurringIncomeDTO> GetRecurringIncome(int userId)
         {
             try
             {
-                var recurringExpenseDtos = new List<RecurringExpenseDTO>();
+                var recurringIncomeDtos = new List<RecurringIncomeDTO>();
 
-                var recurringExpenses = _context.RecurringExpenses
+                var recurringIncomes = _context.RecurringIncomes
                     .Where(e => e.User.Id == userId)
                     .ToList();
 
-                if (recurringExpenses.Any())
+                if (recurringIncomes.Any())
                 {
-                    recurringExpenseDtos = recurringExpenses.Select(_mapper.Map<RecurringExpense, RecurringExpenseDTO>).ToList();
+                    recurringIncomeDtos = recurringIncomes.Select(_mapper.Map<RecurringIncome, RecurringIncomeDTO>).ToList();
                 }
 
-                return recurringExpenseDtos;
+                return recurringIncomeDtos;
             }
             catch (Exception e)
             {
-                _log.LogError(e, "Exception occurred while getting Recurring Expenses");
+                _log.LogError(e, "Exception occurred while getting Recurring Income");
                 throw;
             }
         }
 
-        public bool AddRecurringExpense(int userId, RecurringExpenseDTO recurringExpenseDTO)
+        public bool AddRecurringIncome(int userId, RecurringIncomeDTO recurringIncomeDTO)
         {
             try
             {
@@ -54,7 +55,7 @@ namespace FinancialTrackerApi.Services.Interfaces
                     return false;
                 }
 
-                var recurringExpense = _mapper.Map<RecurringExpenseDTO, RecurringExpense>(recurringExpenseDTO, opts =>
+                var recurringIncome = _mapper.Map<RecurringIncomeDTO, RecurringIncome>(recurringIncomeDTO, opts =>
                 {
                     opts.AfterMap((src, dest) =>
                     {
@@ -62,7 +63,7 @@ namespace FinancialTrackerApi.Services.Interfaces
                     });
                 });
 
-                _context.RecurringExpenses.Add(recurringExpense);
+                _context.RecurringIncomes.Add(recurringIncome);
 
                 _context.SaveChanges();
 
@@ -70,7 +71,7 @@ namespace FinancialTrackerApi.Services.Interfaces
             }
             catch (Exception e)
             {
-                _log.LogError(e, "Exception occurred while adding Recurring Expense");
+                _log.LogError(e, "Exception occurrred while adding Recurring Income");
                 throw;
             }
         }
