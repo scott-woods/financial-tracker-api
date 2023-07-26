@@ -50,10 +50,6 @@ namespace FinancialTrackerApi.Mapping
             CreateMap<RecurringInvestment, RecurringInvestmentDTO>();
             CreateMap<RecurringInvestmentDTO, RecurringInvestment>()
                 .ForMember(x => x.User, opt => opt.Ignore());
-
-            CreateMap<SavingsGoal, SavingsGoalDTO>();
-            CreateMap<SavingsGoalDTO, SavingsGoal>()
-                .ForMember(x => x.User, opt => opt.Ignore());
         }
     }
 }

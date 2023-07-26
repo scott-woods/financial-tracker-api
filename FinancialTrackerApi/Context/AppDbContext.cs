@@ -20,7 +20,6 @@ namespace FinancialTrackerApi.Context
         public DbSet<MonthlySavings> MonthlySavings { get; set; }
         public DbSet<NetWorthReport> NetWorthReports { get; set; }
         public DbSet<RecurringInvestment> RecurringInvestments { get; set; }
-        public DbSet<SavingsGoal> SavingsGoals { get; set; }
 
         #endregion
 

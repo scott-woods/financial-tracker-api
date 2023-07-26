@@ -67,5 +67,37 @@ namespace FinancialTrackerApi.Services
                 throw;
             }
         }
+
+        /// <summary>
+        /// update a user's savings goal
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="newSavingsGoal"></param>
+        /// <returns></returns>
+        public bool UpdateSavingsGoal(int userId, float newSavingsGoal)
+        {
+            try
+            {
+                var user = _context.Users.Where(u => u.Id == userId).FirstOrDefault();
+
+                if (user == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
+                    return false;
+                }
+
+                user.SavingsGoal = newSavingsGoal;
+                user.SavingsGoalLastUpdatedDate = DateTime.UtcNow;
+
+                _context.SaveChanges();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, $"Exception occurred while updating Savings Goal");
+                throw;
+            }
+        }
     }
 }

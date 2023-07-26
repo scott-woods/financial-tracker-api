@@ -21,5 +21,12 @@ namespace FinancialTrackerApi.Services.Interfaces
         /// <param name="auth0UserId"></param>
         /// <returns></returns>
         public User GetUserByAuth0Id(string auth0UserId);
+        /// <summary>
+        /// Update a user's savings goal
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="newSavingsGoal"></param>
+        /// <returns></returns>
+        public bool UpdateSavingsGoal(int userId, float newSavingsGoal);
     }
 }

@@ -1,5 +1,7 @@
 ﻿using FinancialTrackerApi.Models.DatabaseModels;
+using FinancialTrackerApi.Services;
 using FinancialTrackerApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,5 +20,51 @@ namespace FinancialTrackerApi.Controllers
             _userService = userService;
             _log = log;
         }
+
+        #region PUT
+
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpPut]
+        public IActionResult UpdateSavingsGoal(float newSavingsGoal)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while updating Savings Goal - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _userService.UpdateSavingsGoal(userId.Value, newSavingsGoal);
+
+                if (!success)
+                {
+                    var errorMessage = "Updating Savings Goal failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return Ok(success);
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while updating Savings Goal";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
     }
 }
