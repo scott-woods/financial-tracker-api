@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Npgsql;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +18,7 @@ var config = new ConfigurationBuilder()
     .Build();
 
 //Get connection string from appsettings
-var connectionStringBuilder = new SqlConnectionStringBuilder(
+var connectionStringBuilder = new NpgsqlConnectionStringBuilder(
         builder.Configuration.GetConnectionString("MyDbContext"));
 connectionStringBuilder.Password = builder.Configuration["DbPassword"];
 var connectionString = connectionStringBuilder.ConnectionString;
@@ -107,6 +108,7 @@ else if (dbProvider == "Mssql")
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IDebtService, DebtService>();
+builder.Services.AddScoped<IExpenseService,  ExpenseService>();
 
 //Add auto mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
