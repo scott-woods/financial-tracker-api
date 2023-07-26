@@ -28,6 +28,6 @@
         /// <summary>
         /// Date expense stops
         /// </summary>
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

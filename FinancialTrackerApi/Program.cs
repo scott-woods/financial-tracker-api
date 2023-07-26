@@ -109,6 +109,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IDebtService, DebtService>();
 builder.Services.AddScoped<IExpenseService,  ExpenseService>();
+builder.Services.AddScoped<IRecurringExpensesService, RecurringExpensesService>();
 
 //Add auto mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
