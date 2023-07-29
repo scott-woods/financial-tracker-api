@@ -67,6 +67,42 @@ namespace FinancialTrackerApi.Controllers
             }
         }
 
+        /// <summary>
+        /// get the total value of recurring incomes for this user
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(float), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpGet("total")]
+        public IActionResult GetTotalRecurringIncome()
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while getting total recurring income - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var totalRecurringIncome = _recurringIncomeService.GetTotalRecurringIncome(userId.Value);
+
+                return Ok(totalRecurringIncome);
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while getting Total Recurring Income";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
         #endregion
 
         #region POST

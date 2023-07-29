@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using FinancialTrackerApi.Context;
 using FinancialTrackerApi.Models.DTOs;
+using FinancialTrackerApi.Models.RequestModels;
+using FinancialTrackerApi.Services;
 using FinancialTrackerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -64,6 +66,38 @@ namespace FinancialTrackerApi.Controllers
             catch (Exception e)
             {
                 var errorMessage = "Exception occurred while getting Expenses";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        [ProducesResponseType(typeof(float), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpGet("total")]
+        public IActionResult GetTotalExpenses()
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while getting total expenses - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var totalExpenses = _expenseService.GetTotalExpenses(userId.Value);
+
+                return Ok(totalExpenses);
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while getting Total Expenses";
                 _log.LogError(e, errorMessage);
                 return StatusCode(500, e);
             }

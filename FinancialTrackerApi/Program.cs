@@ -117,6 +117,17 @@ builder.Services.AddScoped<IRecurringInvestmentService, RecurringInvestmentServi
 //Add auto mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("_myAllowSpecificOrigins", builder =>
+    {
+        builder
+        .WithOrigins("http://localhost:3000")
+        .WithMethods("GET", "POST", "PUT", "DELETE")
+        .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -132,6 +143,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("_myAllowSpecificOrigins");
 
 app.UseAuthentication();
 

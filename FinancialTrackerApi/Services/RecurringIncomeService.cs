@@ -43,6 +43,30 @@ namespace FinancialTrackerApi.Services
             }
         }
 
+        public float GetTotalRecurringIncome(int userId)
+        {
+            try
+            {
+                var totalRecurringIncome = 0f;
+
+                var recurringIncomes = _context.RecurringIncomes
+                    .Where(e => e.User.Id == userId)
+                    .ToList();
+
+                foreach (var recurringIncome in recurringIncomes)
+                {
+                    totalRecurringIncome += recurringIncome.Amount;
+                }
+
+                return totalRecurringIncome;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Exception occurred while getting Total Recurring Income");
+                throw;
+            }
+        }
+
         public bool AddRecurringIncome(int userId, RecurringIncomeDTO recurringIncomeDTO)
         {
             try

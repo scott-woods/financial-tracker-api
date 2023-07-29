@@ -1,4 +1,5 @@
 ﻿using FinancialTrackerApi.Models.DatabaseModels;
+using FinancialTrackerApi.Models.DTOs;
 using FinancialTrackerApi.Services;
 using FinancialTrackerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -20,6 +21,50 @@ namespace FinancialTrackerApi.Controllers
             _userService = userService;
             _log = log;
         }
+
+        #region GET
+
+        [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpGet]
+        public IActionResult GetUserMetadata()
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while getting User - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var user = _userService.GetUser(userId.Value);
+
+                if (user == null)
+                {
+                    var errorMessage = "Exception occurred while getting User - User not found";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return NotFound(e);
+                }
+
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while getting User Metadata";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
 
         #region PUT
 

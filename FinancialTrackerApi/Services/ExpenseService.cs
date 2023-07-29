@@ -29,16 +29,25 @@ namespace FinancialTrackerApi.Services
         /// <param name="startDate"></param>
         /// <param name="endDate"></param>
         /// <returns></returns>
-        public List<ExpenseDTO> GetExpenses(int userId, DateTime startDate, DateTime endDate)
+        public List<ExpenseDTO> GetExpenses(int userId, DateTime? startDate = null, DateTime? endDate = null)
         {
             try
             {
                 var expenseDtos = new List<ExpenseDTO>();
 
                 var expenses = _context.Expenses
-                    .Where(e => e.User.Id == userId && e.Date >= startDate && e.Date <= endDate)
+                    .Where(e => e.User.Id == userId)
                     .OrderByDescending(e => e.Date)
                     .ToList();
+
+                if (startDate != null)
+                {
+                    expenses = expenses.Where(e => e.Date >= startDate).ToList();
+                }
+                if (endDate != null)
+                {
+                    expenses = expenses.Where(e => e.Date <= endDate).ToList();
+                }
 
                 if (expenses.Any())
                 {
@@ -50,6 +59,40 @@ namespace FinancialTrackerApi.Services
             catch (Exception e)
             {
                 _log.LogError(e, "Exception occurred while getting expenses");
+                throw;
+            }
+        }
+
+        public float GetTotalExpenses(int userId, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            try
+            {
+                var totalExpenses = 0f;
+
+                var expenses = _context.Expenses
+                    .Where(e => e.User.Id == userId)
+                    .OrderByDescending(e => e.Date)
+                    .ToList();
+
+                if (startDate != null)
+                {
+                    expenses = expenses.Where(e => e.Date >= startDate).ToList();
+                }
+                if (endDate != null)
+                {
+                    expenses = expenses.Where(e => e.Date <= endDate).ToList();
+                }
+
+                foreach (var expense in expenses)
+                {
+                    totalExpenses += expense.Amount;
+                }
+
+                return totalExpenses;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Exception occurred while getting total expenses");
                 throw;
             }
         }
