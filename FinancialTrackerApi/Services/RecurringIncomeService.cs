@@ -67,7 +67,7 @@ namespace FinancialTrackerApi.Services
             }
         }
 
-        public bool AddRecurringIncome(int userId, RecurringIncomeDTO recurringIncomeDTO)
+        public RecurringIncomeDTO AddRecurringIncome(int userId, RecurringIncomeDTO recurringIncomeDTO)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace FinancialTrackerApi.Services
                 if (user == null)
                 {
                     if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
-                    return false;
+                    throw new KeyNotFoundException();
                 }
 
                 var recurringIncome = _mapper.Map<RecurringIncomeDTO, RecurringIncome>(recurringIncomeDTO, opts =>
@@ -91,11 +91,73 @@ namespace FinancialTrackerApi.Services
 
                 _context.SaveChanges();
 
-                return true;
+                return _mapper.Map<RecurringIncome, RecurringIncomeDTO>(recurringIncome);
             }
             catch (Exception e)
             {
                 _log.LogError(e, "Exception occurrred while adding Recurring Income");
+                throw;
+            }
+        }
+
+        public bool UpdateRecurringIncome(int userId, RecurringIncomeDTO recurringIncome)
+        {
+            try
+            {
+                var user = _context.Users.Where(u => u.Id == userId).FirstOrDefault();
+
+                if (user == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
+                    return false;
+                }
+
+                var currentRecurringIncome = _context.RecurringIncomes.Find(recurringIncome.Id);
+
+                if (currentRecurringIncome == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Recurring Income with id {recurringIncome.Id} not found");
+                    return false;
+                }
+
+                _context.Entry(currentRecurringIncome).CurrentValues.SetValues(recurringIncome);
+                _context.SaveChanges();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Exception occurred while updating Recurring Income");
+                throw;
+            }
+        }
+
+        public bool RemoveRecurringIncome(int userId, int recurringIncomeId)
+        {
+            try
+            {
+                var user = _context.Users.Where(u => u.Id == userId).FirstOrDefault();
+
+                if (user == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
+                    return false;
+                }
+
+                var recurringIncome = _context.RecurringIncomes.Find(recurringIncomeId);
+
+                if (recurringIncome == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Recurring Income with id {recurringIncomeId} not found");
+                    return false;
+                }
+
+                _context.RecurringIncomes.Remove(recurringIncome);
+                return _context.SaveChanges() > 0;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Exception occurred while deleting Recurring Income");
                 throw;
             }
         }

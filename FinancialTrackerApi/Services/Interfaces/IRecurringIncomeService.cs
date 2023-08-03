@@ -6,6 +6,8 @@ namespace FinancialTrackerApi.Services.Interfaces
     {
         public List<RecurringIncomeDTO> GetRecurringIncome(int userId);
         public float GetTotalRecurringIncome(int userId);
-        public bool AddRecurringIncome(int userId, RecurringIncomeDTO recurringIncome);
+        public RecurringIncomeDTO AddRecurringIncome(int userId, RecurringIncomeDTO recurringIncome);
+        public bool UpdateRecurringIncome(int userId, RecurringIncomeDTO recurringIncome);
+        public bool RemoveRecurringIncome(int userId, int recurringIncomeId);
     }
 }

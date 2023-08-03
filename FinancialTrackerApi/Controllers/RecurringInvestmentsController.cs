@@ -75,7 +75,7 @@ namespace FinancialTrackerApi.Controllers
 
         #region POST
 
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RecurringInvestmentDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -95,11 +95,57 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                var success = _recurringInvestmentService.AddRecurringInvestment(userId.Value, recurringInvestmentDTO);
+                var newRecurringInvestment = _recurringInvestmentService.AddRecurringInvestment(userId.Value, recurringInvestmentDTO);
+
+                if (newRecurringInvestment == null)
+                {
+                    var errorMessage = "Adding to Recurring Investments failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return Ok(newRecurringInvestment);
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while adding Recurring Investment";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
+
+        #region PUT
+
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpPut]
+        public IActionResult UpdateRecurringInvestment(RecurringInvestmentDTO updatedRecurringInvestment)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while updating recurring investment - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _recurringInvestmentService.UpdateRecurringInvestment(userId.Value, updatedRecurringInvestment);
 
                 if (!success)
                 {
-                    var errorMessage = "Adding to Recurring Investments failed";
+                    var errorMessage = "Update to Recurring Investment failed";
                     var e = new Exception(errorMessage);
                     _log.LogError(errorMessage);
                     return StatusCode(500, e);
@@ -111,7 +157,53 @@ namespace FinancialTrackerApi.Controllers
             }
             catch (Exception e)
             {
-                var errorMessage = "Exception occurred while adding Recurring Investment";
+                var errorMessage = "Exception occurred while updating Recurring Investment";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
+
+        #region DELETE
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpDelete]
+        public IActionResult RemoveRecurringInvestment(int recurringInvestmentId)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while deleting recurring investment - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _recurringInvestmentService.RemoveRecurringInvestment(userId.Value, recurringInvestmentId);
+
+                if (!success)
+                {
+                    var errorMessage = "Deleting Recurring Investment failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return NoContent();
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while deleting Recurring Investment";
                 _log.LogError(e, errorMessage);
                 return StatusCode(500, e);
             }

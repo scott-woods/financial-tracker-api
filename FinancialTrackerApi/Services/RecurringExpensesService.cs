@@ -43,7 +43,7 @@ namespace FinancialTrackerApi.Services
             }
         }
 
-        public bool AddRecurringExpense(int userId, RecurringExpenseDTO recurringExpenseDTO)
+        public RecurringExpenseDTO AddRecurringExpense(int userId, RecurringExpenseDTO recurringExpenseDTO)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace FinancialTrackerApi.Services
                 if (user == null)
                 {
                     if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
-                    return false;
+                    throw new KeyNotFoundException();
                 }
 
                 var recurringExpense = _mapper.Map<RecurringExpenseDTO, RecurringExpense>(recurringExpenseDTO, opts =>
@@ -67,11 +67,73 @@ namespace FinancialTrackerApi.Services
 
                 _context.SaveChanges();
 
-                return true;
+                return _mapper.Map<RecurringExpense, RecurringExpenseDTO>(recurringExpense);
             }
             catch (Exception e)
             {
                 _log.LogError(e, "Exception occurred while adding Recurring Expense");
+                throw;
+            }
+        }
+
+        public bool UpdateRecurringExpense(int userId, RecurringExpenseDTO recurringExpense)
+        {
+            try
+            {
+                var user = _context.Users.Where(u => u.Id == userId).FirstOrDefault();
+
+                if (user == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
+                    return false;
+                }
+
+                var currentRecurringExpense = _context.RecurringExpenses.Find(recurringExpense.Id);
+
+                if (currentRecurringExpense == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Recurring Expense with id {recurringExpense.Id} not found");
+                    return false;
+                }
+
+                _context.Entry(currentRecurringExpense).CurrentValues.SetValues(recurringExpense);
+                _context.SaveChanges();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Exception occurred while updating Recurring Expense");
+                throw;
+            }
+        }
+
+        public bool RemoveRecurringExpense(int userId, int recurringExpenseId)
+        {
+            try
+            {
+                var user = _context.Users.Where(u => u.Id == userId).FirstOrDefault();
+
+                if (user == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
+                    return false;
+                }
+
+                var recurringExpense = _context.RecurringExpenses.Find(recurringExpenseId);
+
+                if (recurringExpense == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Recurring Expense with id {recurringExpenseId} not found");
+                    return false;
+                }
+
+                _context.RecurringExpenses.Remove(recurringExpense);
+                return _context.SaveChanges() > 0;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Exception occurred while deleting Recurring Expense");
                 throw;
             }
         }

@@ -75,7 +75,7 @@ namespace FinancialTrackerApi.Controllers
 
         #region POST
 
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NetWorthReportDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -95,9 +95,9 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                var success = _netWorthReportService.AddNetWorthReport(userId.Value, netWorthReportDTO);
+                var newReport = _netWorthReportService.AddNetWorthReport(userId.Value, netWorthReportDTO);
 
-                if (!success)
+                if (newReport == null)
                 {
                     var errorMessage = "Adding to Net Worth Reports failed";
                     var e = new Exception(errorMessage);
@@ -106,7 +106,7 @@ namespace FinancialTrackerApi.Controllers
                 }
                 else
                 {
-                    return Ok(success);
+                    return Ok(newReport);
                 }
             }
             catch (Exception e)

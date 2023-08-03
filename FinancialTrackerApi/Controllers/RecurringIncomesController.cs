@@ -107,7 +107,7 @@ namespace FinancialTrackerApi.Controllers
 
         #region POST
 
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RecurringIncomeDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -127,11 +127,57 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                var success = _recurringIncomeService.AddRecurringIncome(userId.Value, recurringIncomeDTO);
+                var newRecurringIncome = _recurringIncomeService.AddRecurringIncome(userId.Value, recurringIncomeDTO);
+
+                if (newRecurringIncome == null)
+                {
+                    var errorMessage = "Adding to Recurring Income failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return Ok(newRecurringIncome);
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while adding Recurring Income";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
+
+        #region PUT
+
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpPut]
+        public IActionResult UpdateRecurringIncome(RecurringIncomeDTO updatedRecurringIncome)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while updating recurring income - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _recurringIncomeService.UpdateRecurringIncome(userId.Value, updatedRecurringIncome);
 
                 if (!success)
                 {
-                    var errorMessage = "Adding to Recurring Income failed";
+                    var errorMessage = "Update to Recurring Income failed";
                     var e = new Exception(errorMessage);
                     _log.LogError(errorMessage);
                     return StatusCode(500, e);
@@ -143,7 +189,53 @@ namespace FinancialTrackerApi.Controllers
             }
             catch (Exception e)
             {
-                var errorMessage = "Exception occurred while adding Recurring Income";
+                var errorMessage = "Exception occurred while updating Recurring Income";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
+
+        #region DELETE
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpDelete]
+        public IActionResult RemoveRecurringIncome(int recurringIncomeId)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while deleting recurring income - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _recurringIncomeService.RemoveRecurringIncome(userId.Value, recurringIncomeId);
+
+                if (!success)
+                {
+                    var errorMessage = "Deleting Recurring Income failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return NoContent();
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while deleting Recurring Income";
                 _log.LogError(e, errorMessage);
                 return StatusCode(500, e);
             }

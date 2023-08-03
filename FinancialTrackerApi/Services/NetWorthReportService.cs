@@ -44,7 +44,7 @@ namespace FinancialTrackerApi.Services
             }
         }
 
-        public bool AddNetWorthReport(int userId, NetWorthReportDTO netWorthReportDTO)
+        public NetWorthReportDTO AddNetWorthReport(int userId, NetWorthReportDTO netWorthReportDTO)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace FinancialTrackerApi.Services
                 if (user == null)
                 {
                     if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
-                    return false;
+                    throw new KeyNotFoundException();
                 }
 
                 var netWorthReport = _mapper.Map<NetWorthReportDTO, NetWorthReport>(netWorthReportDTO, opts =>
@@ -68,7 +68,7 @@ namespace FinancialTrackerApi.Services
 
                 _context.SaveChanges();
 
-                return true;
+                return _mapper.Map<NetWorthReport, NetWorthReportDTO>(netWorthReport);
             }
             catch (Exception e)
             {

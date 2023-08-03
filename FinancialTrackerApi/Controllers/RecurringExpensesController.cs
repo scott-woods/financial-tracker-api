@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FinancialTrackerApi.Context;
 using FinancialTrackerApi.Models.DTOs;
+using FinancialTrackerApi.Services;
 using FinancialTrackerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -93,9 +94,9 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                var success = _recurringExpensesService.AddRecurringExpense(userId.Value, recurringExpenseDTO);
+                var newRecurringExpense = _recurringExpensesService.AddRecurringExpense(userId.Value, recurringExpenseDTO);
 
-                if (!success)
+                if (newRecurringExpense == null)
                 {
                     var errorMessage = "Failed to add Recurring Expense";
                     var e = new Exception(errorMessage);
@@ -103,11 +104,103 @@ namespace FinancialTrackerApi.Controllers
                     return StatusCode(500, e);
                 }
 
-                return Ok(success);
+                return Ok(newRecurringExpense);
             }
             catch (Exception e)
             {
                 var errorMessage = "Exception occurred while adding Recurring Expense";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
+
+        #region PUT
+
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpPut]
+        public IActionResult UpdateRecurringExpense(RecurringExpenseDTO updatedRecurringExpense)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while updating recurring expense - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _recurringExpensesService.UpdateRecurringExpense(userId.Value, updatedRecurringExpense);
+
+                if (!success)
+                {
+                    var errorMessage = "Update to Recurring Expense failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return Ok(success);
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while updating Recurring Expense";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
+
+        #region DELETE
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpDelete]
+        public IActionResult RemoveRecurringExpense(int recurringExpenseId)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while deleting recurring expense - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _recurringExpensesService.RemoveRecurringExpense(userId.Value, recurringExpenseId);
+
+                if (!success)
+                {
+                    var errorMessage = "Deleting Recurring Expense failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return NoContent();
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while deleting Recurring Expense";
                 _log.LogError(e, errorMessage);
                 return StatusCode(500, e);
             }
