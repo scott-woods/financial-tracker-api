@@ -112,7 +112,7 @@ namespace FinancialTrackerApi.Controllers
         /// </summary>
         /// <param name="expense"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ExpenseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -132,9 +132,9 @@ namespace FinancialTrackerApi.Controllers
                     return BadRequest(e);
                 }
 
-                var success = _expenseService.AddExpense(userId.Value, expense);
+                var newExpense = _expenseService.AddExpense(userId.Value, expense);
 
-                if (!success)
+                if (newExpense == null)
                 {
                     var errorMessage = "Adding to Expenses failed";
                     var e = new Exception(errorMessage);
@@ -143,7 +143,7 @@ namespace FinancialTrackerApi.Controllers
                 }
                 else
                 {
-                    return Ok(success);
+                    return Ok(newExpense);
                 }
             }
             catch (Exception e)

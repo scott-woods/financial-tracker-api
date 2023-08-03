@@ -103,7 +103,7 @@ namespace FinancialTrackerApi.Services
         /// <param name="userId"></param>
         /// <param name="expenseDTO"></param>
         /// <returns></returns>
-        public bool AddExpense(int userId, ExpenseDTO expenseDTO)
+        public ExpenseDTO AddExpense(int userId, ExpenseDTO expenseDTO)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace FinancialTrackerApi.Services
                 if (user == null)
                 {
                     if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
-                    return false;
+                    throw new KeyNotFoundException();
                 }
 
                 var expense = _mapper.Map<ExpenseDTO, Expense>(expenseDTO, opts =>
@@ -120,6 +120,7 @@ namespace FinancialTrackerApi.Services
                     opts.AfterMap((src, dest) =>
                     {
                         dest.User = user;
+                        dest.Date = DateTime.UtcNow;
                     });
                 });
 
@@ -127,7 +128,7 @@ namespace FinancialTrackerApi.Services
 
                 _context.SaveChanges();
 
-                return true;
+                return _mapper.Map<Expense, ExpenseDTO>(expense);
             }
             catch (Exception e)
             {
