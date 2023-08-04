@@ -136,5 +136,67 @@ namespace FinancialTrackerApi.Services
                 throw;
             }
         }
+
+        public bool UpdateExpense(int userId, ExpenseDTO expense)
+        {
+            try
+            {
+                var user = _context.Users.Where(u => u.Id == userId).FirstOrDefault();
+
+                if (user == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
+                    return false;
+                }
+
+                var currentExpense = _context.Expenses.Find(expense.Id);
+
+                if (currentExpense == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Expense with id {expense.Id} not found");
+                    return false;
+                }
+
+                _context.Entry(currentExpense).CurrentValues.SetValues(expense);
+                _context.SaveChanges();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Exception occurred while updating Expense");
+                throw;
+            }
+        }
+
+        public bool RemoveExpense(int userId, int expenseId)
+        {
+            try
+            {
+                var user = _context.Users.Where(u => u.Id == userId).FirstOrDefault();
+
+                if (user == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Failed to find User with id {userId}");
+                    return false;
+                }
+
+                var expense = _context.Expenses.Find(expenseId);
+
+                if (expense == null)
+                {
+                    if (_log.IsEnabled(LogLevel.Debug)) _log.LogDebug($"Expense with id {expenseId} not found");
+                    return false;
+                }
+
+                _context.Expenses.Remove(expense);
+                return _context.SaveChanges() > 0;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Exception occurred while deleting Expense");
+                throw;
+            }
+        }
     }
 }

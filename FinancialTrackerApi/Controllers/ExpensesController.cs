@@ -155,5 +155,97 @@ namespace FinancialTrackerApi.Controllers
         }
 
         #endregion
+
+        #region PUT
+
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpPut]
+        public IActionResult UpdateExpense(ExpenseDTO updatedExpense)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while updating expense - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _expenseService.UpdateExpense(userId.Value, updatedExpense);
+
+                if (!success)
+                {
+                    var errorMessage = "Update to Expense failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return Ok(success);
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while updating Expense";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
+
+        #region DELETE
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpDelete]
+        public IActionResult RemoveRecurringIncome(int expenseId)
+        {
+            try
+            {
+                //validate userId
+                if (!userId.HasValue)
+                {
+                    var errorMessage = "Exception occurred while deleting expense - Invalid User Id";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var success = _expenseService.RemoveExpense(userId.Value, expenseId);
+
+                if (!success)
+                {
+                    var errorMessage = "Deleting Expense failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return NoContent();
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while deleting Expense";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
     }
 }
