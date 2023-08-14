@@ -1,5 +1,6 @@
 ﻿using FinancialTrackerApi.Models.DatabaseModels;
 using FinancialTrackerApi.Models.DTOs;
+using FinancialTrackerApi.Models.RequestModels;
 
 namespace FinancialTrackerApi.Services.Interfaces
 {
@@ -21,6 +22,12 @@ namespace FinancialTrackerApi.Services.Interfaces
         /// <param name="auth0UserId"></param>
         /// <returns></returns>
         public User GetUserByAuth0Id(string auth0UserId);
+        /// <summary>
+        /// Add a new user
+        /// </summary>
+        /// <param name="userRequest"></param>
+        /// <returns></returns>
+        public UserDTO AddUser(AddUserRequest userRequest);
         /// <summary>
         /// Update a user's savings goal
         /// </summary>

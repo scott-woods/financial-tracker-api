@@ -2,6 +2,7 @@
 using FinancialTrackerApi.Context;
 using FinancialTrackerApi.Models.DatabaseModels;
 using FinancialTrackerApi.Models.DTOs;
+using FinancialTrackerApi.Models.RequestModels;
 using FinancialTrackerApi.Services.Interfaces;
 
 namespace FinancialTrackerApi.Services
@@ -64,6 +65,36 @@ namespace FinancialTrackerApi.Services
             catch (Exception e)
             {
                 _log.LogError(e, $"Exception occurred while getting User with Auth0 id {auth0UserId}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// add a new user
+        /// </summary>
+        /// <param name="userRequest"></param>
+        /// <returns></returns>
+        public UserDTO AddUser(AddUserRequest userRequest)
+        {
+            try
+            {
+                var user = new User()
+                {
+                    Auth0UserId = userRequest.Auth0UserId,
+                    Email = userRequest.Email,
+                    SavingsGoal = 0,
+                    SavingsGoalLastUpdatedDate = DateTime.UtcNow
+                };
+
+                _context.Users.Add(user);
+
+                _context.SaveChanges();
+
+                return _mapper.Map<User, UserDTO>(user);
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, $"Exception occurred while adding User");
                 throw;
             }
         }

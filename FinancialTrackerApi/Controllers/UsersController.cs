@@ -1,5 +1,6 @@
 ﻿using FinancialTrackerApi.Models.DatabaseModels;
 using FinancialTrackerApi.Models.DTOs;
+using FinancialTrackerApi.Models.RequestModels;
 using FinancialTrackerApi.Services;
 using FinancialTrackerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -59,6 +60,50 @@ namespace FinancialTrackerApi.Controllers
             catch (Exception e)
             {
                 var errorMessage = "Exception occurred while getting User Metadata";
+                _log.LogError(e, errorMessage);
+                return StatusCode(500, e);
+            }
+        }
+
+        #endregion
+
+        #region POST
+
+        [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpPost]
+        public IActionResult AddUser(AddUserRequest userRequest)
+        {
+            try
+            {
+                if (userRequest == null)
+                {
+                    var errorMessage = "Exception occurred while adding User - User cannot be null";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return BadRequest(e);
+                }
+
+                var newUser = _userService.AddUser(userRequest);
+
+                if (newUser == null)
+                {
+                    var errorMessage = "Adding to Users failed";
+                    var e = new Exception(errorMessage);
+                    _log.LogError(errorMessage);
+                    return StatusCode(500, e);
+                }
+                else
+                {
+                    return Ok(newUser);
+                }
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Exception occurred while adding User";
                 _log.LogError(e, errorMessage);
                 return StatusCode(500, e);
             }
